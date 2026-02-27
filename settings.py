@@ -1,0 +1,3 @@
+LOGIN_URL = "/"
+LOGIN_REDIRECT_URL = "/products/"
+LOGOUT_REDIRECT_URL = "/"

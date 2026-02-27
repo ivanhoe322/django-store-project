@@ -1,0 +1,56 @@
+{% load static %}
+{% load django_bootstrap5 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <title>{% block title %}Магазин электроники{% endblock %}</title>
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+<nav style="display:flex; justify-content:space-between; align-items:center; padding:10px 0;">
+  <div>
+    <a href="{% url 'products:product_list' %}"><b>Магазин электроники</b></a>
+    |
+    <a href="{% url 'products:product_list' %}">Товары</a>
+
+    {% if user.is_authenticated %}
+      {% if user.is_superuser or is_manager %}
+        | <a href="{% url 'orders:order_list' %}">Заказы</a>
+      {% endif %}
+    {% endif %}
+  </div>
+
+  <div>
+    {% if user.is_authenticated %}
+      <span>{{ user.get_full_name|default:user.username }}</span>
+      |
+      <a href="{% url 'accounts:profile' %}">Профиль</a>
+      |
+      <a href="/accounts/logout/">Выход</a>
+    {% else %}
+      <a href="{% url 'accounts:login' %}">Войти</a>
+    {% endif %}
+  </div>
+</nav>
+
+{% if messages %}
+  <div>
+    {% for message in messages %}
+      <div>{{ message }}</div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+<hr>
+
+{% block content %}{% endblock %}
+
+{% block extra_js %}{% endblock %}
+
+</body>
+</html>
