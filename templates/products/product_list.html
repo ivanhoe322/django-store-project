@@ -3,6 +3,11 @@
 {% block title %}Список товаров{% endblock %}
 
 {% block content %}
+<style>
+  .row-discount-15 td { background-color: #2E8B57 !important; color: #fff; }
+  .row-out-of-stock td { background-color: #ADD8E6 !important; }
+  .old-price { color: red; text-decoration: line-through; margin-right: 6px; }
+</style>
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1><i class="bi bi-list-ul"></i> Список товаров</h1>
 
@@ -81,8 +86,7 @@
                 </thead>
                 <tbody>
                     {% for product in page_obj %}
-                    <tr
-                        class="product-row {% if product.discount > 15 %}discount-high{% endif %} {% if not product.is_available %}out-of-stock{% endif %}">
+                    <tr class="product-row {% if product.quantity == 0 %}row-out-of-stock{% elif product.discount > 15 %}row-discount-15{% endif %}">
                         <td>
                             {% if product.image %}
                             <img src="{{ product.image.url }}" alt="{{ product.name }}"
@@ -104,10 +108,10 @@
                         <td>{{ product.supplier.name }}</td>
                         <td>
                             {% if product.discount > 0 %}
-                            <span class="original-price">{{ product.price }} ₽</span><br>
-                            <span class="final-price">{{ product.final_price }} ₽</span>
+                                <span class="old-price">{{ product.price }} ₽</span>
+                                <span>{{ product.final_price }} ₽</span>
                             {% else %}
-                            {{ product.price }} ₽
+                                {{ product.price }} ₽
                             {% endif %}
                         </td>
                         <td>{{ product.unit.name }}</td>

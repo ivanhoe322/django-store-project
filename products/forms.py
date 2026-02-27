@@ -1,4 +1,7 @@
 from django import forms
+from django.core.exceptions import ValidationError
+from PIL import Image
+
 from .models import Product
 
 
@@ -31,3 +34,21 @@ class ProductForm(forms.ModelForm):
         self.fields['discount'].help_text = 'Скидка в процентах (0-100)'
         self.fields['quantity'].help_text = 'Количество на складе (не может быть отрицательным)'
         self.fields['image'].help_text = 'Изображение товара (опционально)'
+    
+    def clean_image(self):
+        image = self.cleaned_data.get('image')
+        if not image:
+            return image
+
+        try:
+            img = Image.open(image)
+            width, height = img.size
+        except Exception:
+            raise ValidationError('Не удалось прочитать изображение. Загрузите файл изображения.')
+
+        if width > 300 or height > 200:
+            raise ValidationError('Изображение должно быть не больше 300×200 пикселей.')
+
+        # важно: вернём курсор файла в начало
+        image.seek(0)
+        return image

@@ -1,5 +1,7 @@
 from django.db import models
 from django.core.validators import MinValueValidator
+from django.core.exceptions import ValidationError
+from PIL import Image
 from decimal import Decimal
 
 
@@ -109,3 +111,18 @@ class Product(models.Model):
     def is_available(self):
         """Проверка доступности товара"""
         return self.quantity > 0
+
+    
+
+    def clean(self):
+        super().clean()
+
+        if self.image:
+            try:
+                img = Image.open(self.image)
+                width, height = img.size
+            except Exception:
+                raise ValidationError("Не удалось прочитать изображение.")
+
+            if width > 300 or height > 200:
+                raise ValidationError("Изображение должно быть не больше 300×200 пикселей.")
