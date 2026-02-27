@@ -77,22 +77,6 @@ def product_list(request):
     }
     return render(request, 'products/product_list.html', context)
 
-    # Пагинация
-    paginator = Paginator(products, 10)  # 10 товаров на страницу
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-
-    context = {
-        'page_obj': page_obj,
-        'user_role': user_role,
-        'suppliers': suppliers,
-        'search_query': search_query,
-        'supplier_filter': supplier_filter,
-        'sort_by': sort_by,
-    }
-
-    return render(request, 'products/product_list.html', context)
-
 
 @login_required
 def product_create(request):
