@@ -120,12 +120,11 @@
                         {% if user.is_authenticated and user.is_superuser %}
                         <td>
                             <div class="btn-group" role="group">
-                                <a href="{% url 'products:product_update' product.pk %}"
-                                    class="btn btn-sm btn-outline-primary">
+                                <a href="{% url 'products:product_update' product.pk %}" class="btn btn-sm btn-outline-primary js-edit-btn">
                                     <i class="bi bi-pencil"></i>
                                 </a>
-                                <a href="{% url 'products:product_delete' product.pk %}"
-                                    class="btn btn-sm btn-outline-danger"
+                                <a href="{% url 'products:product_delete' product.pk %}" 
+                                    class="btn btn-sm btn-outline-danger js-delete-btn"
                                     onclick="return confirm('Вы уверены, что хотите удалить этот товар?')">
                                     <i class="bi bi-trash"></i>
                                 </a>
@@ -219,5 +218,24 @@ document.addEventListener('DOMContentLoaded', function () {
     if (supplier) supplier.addEventListener('change', () => form.submit());
     if (sort) sort.addEventListener('change', () => form.submit());
 });
+// запрет "двух окон редактирования": после клика блокируем остальные действия
+document.addEventListener('click', function (e) {
+    const editBtn = e.target.closest('.js-edit-btn');
+    const deleteBtn = e.target.closest('.js-delete-btn');
+
+    if (!editBtn && !deleteBtn) return;
+
+    // блокируем все кнопки редактирования/удаления
+    document.querySelectorAll('.js-edit-btn, .js-delete-btn').forEach(btn => {
+        btn.classList.add('disabled');
+        btn.setAttribute('aria-disabled', 'true');
+        btn.addEventListener('click', function (evt) { evt.preventDefault(); }, { once: true });
+    });
+
+    // но нажатая кнопка должна сработать
+    const clicked = editBtn || deleteBtn;
+    clicked.classList.remove('disabled');
+    clicked.removeAttribute('aria-disabled');
+}, true);
 </script>
 {% endblock %}
