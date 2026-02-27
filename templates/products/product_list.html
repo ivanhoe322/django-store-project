@@ -197,45 +197,35 @@
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    const form = document.querySelector('form[method="get"]');
-    if (!form) return;
-
+  const form = document.querySelector('form[method="get"]');
+  if (form) {
     const search = document.getElementById('search');
     const supplier = document.getElementById('supplier');
     const sort = document.getElementById('sort');
-
     let timer = null;
 
-    // поиск — отправляем с задержкой (чтобы не слать запрос на каждую букву)
     if (search) {
-        search.addEventListener('input', function () {
-            clearTimeout(timer);
-            timer = setTimeout(() => form.submit(), 400);
-        });
+      search.addEventListener('input', function () {
+        clearTimeout(timer);
+        timer = setTimeout(() => form.submit(), 400);
+      });
     }
-
-    // выпадашки — отправляем сразу
     if (supplier) supplier.addEventListener('change', () => form.submit());
     if (sort) sort.addEventListener('change', () => form.submit());
-});
-// запрет "двух окон редактирования": после клика блокируем остальные действия
-document.addEventListener('click', function (e) {
-    const editBtn = e.target.closest('.js-edit-btn');
-    const deleteBtn = e.target.closest('.js-delete-btn');
+  }
 
-    if (!editBtn && !deleteBtn) return;
+  // блокируем остальные кнопки редакт/удаления, но НЕ ломаем текущий клик
+  document.addEventListener('click', function (e) {
+    const clickedBtn = e.target.closest('.js-edit-btn, .js-delete-btn');
+    if (!clickedBtn) return;
 
-    // блокируем все кнопки редактирования/удаления
     document.querySelectorAll('.js-edit-btn, .js-delete-btn').forEach(btn => {
-        btn.classList.add('disabled');
-        btn.setAttribute('aria-disabled', 'true');
-        btn.addEventListener('click', function (evt) { evt.preventDefault(); }, { once: true });
+      if (btn === clickedBtn) return;
+      btn.classList.add('disabled');
+      btn.setAttribute('aria-disabled', 'true');
+      btn.style.pointerEvents = 'none'; // чтобы точно не кликалось
     });
-
-    // но нажатая кнопка должна сработать
-    const clicked = editBtn || deleteBtn;
-    clicked.classList.remove('disabled');
-    clicked.removeAttribute('aria-disabled');
-}, true);
+  }); // <-- важно: без "true"
+});
 </script>
 {% endblock %}

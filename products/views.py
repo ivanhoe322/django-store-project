@@ -83,14 +83,14 @@ def product_create(request):
     """Создание нового товара (только для администраторов)"""
     if not request.user.is_superuser:
         messages.error(request, 'У вас нет прав для выполнения этого действия.')
-        return redirect('main:product_list')
+        return redirect('products:product_list')
 
     if request.method == 'POST':
         form = ProductForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
             messages.success(request, 'Товар успешно создан.')
-            return redirect('main:product_list')
+            return redirect('products:product_list')
     else:
         form = ProductForm()
 
@@ -106,7 +106,7 @@ def product_update(request, pk):
     """Редактирование товара (только для администраторов)"""
     if not request.user.is_superuser:
         messages.error(request, 'У вас нет прав для выполнения этого действия.')
-        return redirect('main:product_list')
+        return redirect('products:product_list')
 
     product = get_object_or_404(Product, pk=pk)
 
@@ -118,7 +118,7 @@ def product_update(request, pk):
                 product.image.delete()
             form.save()
             messages.success(request, 'Товар успешно обновлен.')
-            return redirect('main:product_list')
+            return redirect('products:product_list')
     else:
         form = ProductForm(instance=product)
 
@@ -135,14 +135,14 @@ def product_delete(request, pk):
     """Удаление товара (только для администраторов)"""
     if not request.user.is_superuser:
         messages.error(request, 'У вас нет прав для выполнения этого действия.')
-        return redirect('main:product_list')
+        return redirect('products:product_list')
 
     product = get_object_or_404(Product, pk=pk)
 
     # Проверяем, используется ли товар в заказах
     if hasattr(product, 'orderitem_set') and product.orderitem_set.exists():
         messages.error(request, 'Невозможно удалить товар, который присутствует в заказах.')
-        return redirect('main:product_list')
+        return redirect('products:product_list')
 
     if request.method == 'POST':
         # Удаляем изображение
@@ -150,7 +150,7 @@ def product_delete(request, pk):
             product.image.delete()
         product.delete()
         messages.success(request, 'Товар успешно удален.')
-        return redirect('main:product_list')
+        return redirect('products:product_list')
 
     return render(request, 'products/product_confirm_delete.html', {
         'product': product,
